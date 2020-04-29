@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Text</title>
+    <style>
+
+			body {
+				margin: 0px;
+			}
+
+			#header a {
+				text-decoration: none;
+			}
+
+			#header {
+				padding: 10px;
+				background-color: #000;
+			}
+
+			#header a {
+				color: #fff;
+				padding: 10px;
+			}
+
+			#header a:hover {
+				color: #f00;
+			}
+
+			#menu {
+				float: right;
+				width: 20%;
+				right: 10px;
+				margin-top: 10px;
+			}
+
+			#menu a {
+				display: block;
+				padding: 10px;
+				border: 1px solid #ddd;
+			}
+
+			#menu a:hover {
+				cursor: pointer;
+			}
+
+			#menu ul {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+
+			section.wrapper {
+				padding: 10px;
+				width: 70%;
+			}
+
+			textarea {
+				overflow: scroll;
+				height: 100%;
+			}
+    </style>
+    <script>
+
+		function createProcessor(textProcessor){
+
+			var li = document.createElement('li');
+			var a = document.createElement('a');
+			var ul = document.getElementById('menu-links');
+			var textElement = document.getElementById('textarea');
+
+			a.textContent = textProcessor.title;
+			textProcessor.textElement = textElement;
+			a.addEventListener('click', textProcessor.execute);
+			li.appendChild(a);
+			ul.appendChild(li);
+		}
+
+		function windowOnLoad(){
+			textProcessorTabToMarkdown();
+			textProcessorRsyslog();
+			textProcessorPrintableCharacter();
+		}
+
+		function textProcessorTabToMarkdown(){
+
+			var textProcessor = new Object;
+			textProcessor.title = 'Tab delimited to Markdown';
+			textProcessor.textElement = null;
+			textProcessor.execute = function(){
+
+				// covert text into data
+
+				text = textProcessor.textElement.value;
+				text = text.replace(/\*/g, '\\*');
+				textResult = '';
+
+				row = [];
+				text.split('\n').forEach(function(line){
+					field = line.split('\t');
+					row.push(field);
+				});
+
+				// convert data to text
+				resultLine = [];
+				rowIndex = 0;
+				row.forEach(function(rowItem){
+					lineText = '';
+					resultField = [];
+					textResult = textResult + '| '+ rowItem.join(' | ') + ' |\n';
+					if (rowIndex == 0){
+						textResult = textResult + '';
+						rowItem.forEach(function(){
+							textResult = textResult + '|-----';
+						});
+						textResult = textResult + '|\n';
+					}
+					rowIndex++;
+				});
+
+				// console.log(textResult);
+				textProcessor.textElement.value = textResult;
+			};
+
+			createProcessor(textProcessor);
+		}
+
+		function textProcessorRsyslog(){
+
+			var textProcessor = new Object;
+			textProcessor.title = 'Format Rsyslog';
+			textProcessor.textElement = null;
+			textProcessor.execute = function(){
+
+				// covert text into data
+
+				textResult = textProcessor.textElement.value;
+				textResult = textResult.trim();
+				textResult = textResult.replace(/#012/g, String.fromCharCode(10));
+				textProcessor.textElement.value = textResult;
+			};
+
+			createProcessor(textProcessor);
+		}
+
+		function textProcessorPrintableCharacter(){
+
+			var textProcessor = new Object;
+			textProcessor.title = 'Printable Character';
+			textProcessor.textElement = null;
+			textProcessor.execute = function(){
+
+				// covert text into data
+
+				textResult = textProcessor.textElement.value;
+				textResult = textResult.trim();
+				textResult = textResult.replace(/[^ -~\n\t]+/g, '');
+				textProcessor.textElement.value = textResult;
+			};
+
+			createProcessor(textProcessor);
+		}
+
+
+		window.addEventListener('load', function(){
+			windowOnLoad();
+		});
+
+    </script>
+</head>
+<body>
+
+	<header id="header">
+		<nav>
+			<a href="#">Undo</a>
+			<a href="#">Redo</a>
+		</nav>
+	</header>
+
+	<nav id="menu">
+		<ul class="links" id="menu-links"></ul>
+	</nav>
+
+	<section class="wrapper">
+		<textarea id="textarea" rows=30 cols=100></textarea>
+	</section>
+
+	<footer id="footer">
+
+	</footer>
+</body>
+</html>
